@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <record id="transics_config_settings" model="ir.ui.view">
+            <field name="name">transics.config.settings</field>
+            <field name="model">transics.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="Transics Settings" class="oe_form_configuration">
+                    <header>
+                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                    </header>
+                    <group>
+                        <field name="transics_url"/>
+                        <field name="dispatcher"/>
+                        <field name="password"/>
+                        <field name="systemnr"/>
+                        <field name="integrator"/>
+                        <field name="act_load_id"/>
+                        <field name="act_unload_id"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_transics_config_settings" model="ir.actions.act_window">
+            <field name="name">Transics Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">transics.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+
+        <menuitem action="action_transics_config_settings"
+                  name="Transics Settings"
+                  id="transics_config_settings_menu"
+                  parent="base.menu_config" />
+               <!--   groups="base.group_no_one"/> -->
+
+    </data>
+</openerp>
