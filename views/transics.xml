@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+         <record model="ir.ui.view" id="transics_log_tree">
+            <field name="name">transics.transics_log_tree</field>
+            <field name="model">transics.log</field>
+            <field name="priority">99</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="create_date"/>
+                    <!--field name="response"/-->
+                </tree>
+            </field>
+        </record>
+        <record model="ir.actions.act_window" id="transics_log_action">
+            <field name="name">Transics log</field>
+            <field name="res_model">transics.log</field>
+            <field name="domain"></field>
+            <!-- field name="context">{'default_partner_id':ref('res.partner.partner_id'), 'default_company_id':ref('res.partner.company_id')}></field> -->
+            <!--field name="context"></field-->
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem id="menu_config_transics" name="Transics" parent="base.menu_custom" />
+	<menuitem id="menu_config_transics_log" name="Log" parent="transics.menu_config_transics" action="transics_log_action"/>
+</data>
+
+
+
+</openerp>

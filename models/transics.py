@@ -83,6 +83,55 @@ class transics(models.Model):
 			raise exceptions.Warning(response)
 		return response
 
+	def Cancel_Planning(self,planningitemselection=None):
+		request_data = {
+			'Login':self._makeLogin(),
+			'PlanningItemSelection':planningitemselection
+			}
+		response=transics_client.service.Cancel_Planning(**request_data)
+		if response['Errors']:
+			raise exceptions.Warning(response)
+		return response	
+
+
+
+
+	@api.multi	
+	def dispatcher_query(self,dummy=None):
+		#pdb.set_trace()
+		startdate=fields.Datetime.from_string(self.env['ir.config_parameter'].get_param('transics.MaximumModificationDate'))
+		if not startdate:
+			startdate=datetime.now() - timedelta(hours=1)
+		request_data = {
+			'Login':self._makeLogin(),
+			'PlanningModificationsSelection':{
+				'PlanningSelectionType':'ALL',
+				'DateTimeRange':{'StartDate': startdate, 'EndDate': datetime.now()}
+			}
+			}
+		#logger.info(request_data) 
+
+		response=transics_client.service.Get_Planning_Modifications_V8(**request_data)
+		#pdb.set_trace()
+		self.env['transics.log'].create({'response':str(response),
+										'request_data':str(request_data)
+										})
+		if response['Errors']:
+			_logger.info("Error Get_Planning_Modifications_V8")
+		else:
+			self.env['ir.config_parameter'].set_param('transics.MaximumModificationDate', response['MaximumModificationDate'])
+
+
+		
+class transics_log(models.Model):
+	_name="transics.log"
+
+	MaximumModificationDate=fields.Datetime()
+	errors=fields.Char()
+	warnings=fields.Char()
+	response=fields.Char()
+	request_data=fields.Char()
+
 
 class base_config_settings(models.TransientModel):
 	_name = 'transics.config.settings'
