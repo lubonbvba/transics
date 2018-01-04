@@ -4,6 +4,7 @@ import pdb
 import logging
 from datetime import date,datetime,timedelta
 from pytz import timezone
+from dateutil import tz
 import time
 
 from zeep import Client
@@ -102,15 +103,19 @@ class transics(models.Model):
 		startdate=fields.Datetime.from_string(self.env['ir.config_parameter'].get_param('transics.MaximumModificationDate'))
 		if not startdate:
 			startdate=datetime.now() - timedelta(hours=1)
+		enddate=datetime.now()
+		offset = timedelta(hours=1)
+#		startdate +=offset
+		enddate +=offset
 		request_data = {
 			'Login':self._makeLogin(),
 			'PlanningModificationsSelection':{
 				'PlanningSelectionType':'ALL',
-				'DateTimeRange':{'StartDate': startdate, 'EndDate': datetime.now()}
+				'DateTimeRange':{'StartDate': startdate, 'EndDate': enddate}
 			}
 			}
 		#logger.info(request_data) 
-
+		#pdb.set_trace()
 		response=transics_client.service.Get_Planning_Modifications_V8(**request_data)
 		#pdb.set_trace()
 		self.env['transics.log'].create({'response':str(response),
