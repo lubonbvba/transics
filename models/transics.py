@@ -106,6 +106,7 @@ class transics(models.Model):
 		enddate=datetime.now()
 		offset = timedelta(hours=1)
 #		startdate +=offset
+		#pdb.set_trace()
 		enddate +=offset
 		request_data = {
 			'Login':self._makeLogin(),
@@ -124,8 +125,37 @@ class transics(models.Model):
 		if response['Errors']:
 			_logger.info("Error Get_Planning_Modifications_V8")
 		else:
-			self.env['ir.config_parameter'].set_param('transics.MaximumModificationDate', response['MaximumModificationDate'])
+			self.env['ir.config_parameter'].set_param('transics.MaximumModificationDate', response['MaximumModificationDate']- timedelta(minutes=5))
+		
+		if 'Places' in response and response['Places']:
+			for place in response['Places']['PlaceItemResult_V5']:
+				hist=self.env['hertsens.destination.hist'].search([('place_id', "=",place['PlaceId'])])
+				if not hist:
+					hist=self.env['hertsens.destination.hist'].create({
+						'place_id': place['PlaceId'],
+						})
+				hist.cancelstatus=place['CancelStatus']	
+				hist.transferstatus=place['TransferStatus']	
+				hist.status=place['Status']	
+				hist.lastupdate=place['ModificationDate']-offset
+				hist.raw=place
+				if place['Driver']:
+					driver = self.env['res.users'].search([('transics_id', "=",place['Driver']['ID'])])
+					if driver:
+						hist.driver_id=driver.id
+				hist.hertsens_destination_id.checkstatus()		
 
+		if 'ExtraInfos' in response and response['ExtraInfos']:
+			for info in response['ExtraInfos']['ExtraInfo_V3']:
+				p=info['Place']['CustomerID']
+				hist=self.env['hertsens.destination.hist'].search([('place_id', "=",info['Place']['CustomerID'])])
+				if hist and info['TypeCode'] == 'CMR':
+					hist.cmr=info['Info']
+				if hist and info['TypeCode'] == 'EUU':
+					hist.pallet_unload=info['Info']
+				if hist and info['TypeCode'] == 'EUL':
+					hist.pallet_load=info['Info']
+				#pdb.set_trace()
 
 		
 class transics_log(models.Model):
@@ -141,6 +171,7 @@ class transics_log(models.Model):
 class base_config_settings(models.TransientModel):
 	_name = 'transics.config.settings'
 	_inherit = 'res.config.settings'
+	_order = 'create_date DESC'
 
 	def _get_transics_url(self):
 		return self.env['ir.config_parameter'].get_param('transics.transics_url', '')
