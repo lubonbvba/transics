@@ -125,7 +125,7 @@ class transics(models.Model):
 		if response['Errors']:
 			_logger.info("Error Get_Planning_Modifications_V8")
 		else:
-			self.env['ir.config_parameter'].set_param('transics.MaximumModificationDate', response['MaximumModificationDate']- timedelta(minutes=5))
+			self.env['ir.config_parameter'].sudo().set_param('transics.MaximumModificationDate', response['MaximumModificationDate'] - timedelta(minutes=1))
 		
 		if 'Places' in response and response['Places']:
 			for place in response['Places']['PlaceItemResult_V5']:
