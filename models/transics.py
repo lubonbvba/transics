@@ -140,9 +140,9 @@ class transics(models.Model):
 				hist.lastupdate=place['ModificationDate']-offset
 				hist.raw=place
 				if place['Driver']:
-					driver = self.env['res.users'].search([('transics_id', "=",place['Driver']['ID'])])
+					driver = self.env['hr.employee'].search([('transics_id', "=",place['Driver']['ID'])])
 					if driver:
-						hist.driver_id=driver.id
+						hist.employee_id=driver.id
 				hist.hertsens_destination_id.checkstatus()		
 
 		if 'ExtraInfos' in response and response['ExtraInfos']:
@@ -156,8 +156,19 @@ class transics(models.Model):
 				if hist and info['TypeCode'] == 'EUL':
 					hist.pallet_load=info['Info']
 				#pdb.set_trace()
+		if 'Consultation' in response and response['Consultation']:
+			for consult in response['Consultation']['Consultation_V4']:
+				#pdb.set_trace()
+				hist=self.env['hertsens.destination.hist'].search([('place_id', "=",consult['Place']['PlaceID'])])
+				if hist:
+					hist.km=consult['Km']
 
-		
+					hist.arrivaldate=consult['ArrivalDate'] or hist.arrivaldate
+					hist.leavingdate=consult['LeavingDate'] or hist.leavingdate
+					if consult['Position']:
+						hist.longitude=consult['Position']['Longitude']
+						hist.latitude=consult['Position']['Latitude']
+				
 class transics_log(models.Model):
 	_name="transics.log"
 
