@@ -6,7 +6,7 @@
             <field name="model">transics.log</field>
             <field name="priority">99</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree default_order="create_date DESC">
                     <field name="create_date"/>
                     <!--field name="response"/-->
                 </tree>
