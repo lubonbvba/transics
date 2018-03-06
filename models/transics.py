@@ -452,7 +452,7 @@ class transics_account(models.Model):
 							'datas': att['Document'],
 							})
 					else:
-						_logger.Warning('Rit bij scan %d niet gevonden' % doc['ScanID'])
+						_logger.warning('Rit bij scan %d niet gevonden' % doc['ScanID'])
 
 
 
