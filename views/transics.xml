@@ -1,31 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-         <record model="ir.ui.view" id="transics_log_tree">
-            <field name="name">transics.transics_log_tree</field>
-            <field name="model">transics.log</field>
-            <field name="priority">99</field>
-            <field name="arch" type="xml">
-                <tree default_order="create_date DESC">
-                    <field name="create_date"/>
-                    <!--field name="response"/-->
+       <record model="ir.ui.view" id="transics_log_tree">
+        <field name="name">transics.transics_log_tree</field>
+        <field name="model">transics.log</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <tree default_order="create_date DESC">
+                <field name="create_date"/>
+                <!--field name="response"/-->
+            </tree>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="transics_log_action">
+        <field name="name">Transics log</field>
+        <field name="res_model">transics.log</field>
+        <field name="domain"></field>
+        <!-- field name="context">{'default_partner_id':ref('res.partner.partner_id'), 'default_company_id':ref('res.partner.company_id')}></field> -->
+        <!--field name="context"></field-->
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="transics_account_action">
+        <field name="name">Transics Accounts</field>
+        <field name="res_model">transics.account</field>
+        <field name="domain"></field>
+        <!-- field name="context">{'default_partner_id':ref('res.partner.partner_id'), 'default_company_id':ref('res.partner.company_id')}></field> -->
+        <!--field name="context"></field-->
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record model="ir.ui.view" id="transics_log_tree">
+        <field name="name">transics.transics_log_tree</field>
+        <field name="model">transics.log</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <tree default_order="create_date DESC">
+                <field name="create_date"/>
+                <!--field name="response"/-->
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="transics_account_tree">
+        <field name="name">transics.transics_account_tree</field>
+        <field name="model">transics.account</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="transics_url"/>
+                    <field name="systemnr"/>
+
                 </tree>
             </field>
         </record>
-        <record model="ir.actions.act_window" id="transics_log_action">
-            <field name="name">Transics log</field>
-            <field name="res_model">transics.log</field>
-            <field name="domain"></field>
-            <!-- field name="context">{'default_partner_id':ref('res.partner.partner_id'), 'default_company_id':ref('res.partner.company_id')}></field> -->
-            <!--field name="context"></field-->
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
+            <record model="ir.ui.view" id="transics_account_form">
+                <field name="name">transics.transics_account_form</field>
+                <field name="model">transics.account</field>
+                <field name="priority">99</field>
+                <field name="arch" type="xml">
+                    <form>
+                        <header>
+                            <button type="object" string="Test Login" name="test_login"/>
+                            <button type="object" string="Load Activities" name="load_activities"/>
+                            <button type="object" string="Refresh" name="refresh_transics"/>
+                            <button type="object" string="Update destinations" name="update_all_dest"/>
+                        </header>
+                        <group>
+                            <field name="name"/>
+                            <field name="transics_url"/>
+                            <field name="systemnr"/>
+                            <field name="dispatcher"/>
+                            <field name="password"/>
+                            <field name="integrator"/>
+                            <field name="language"/>
+                            <field name="last_sync"/>
+                            <field name="time_offset"/>
 
-	<menuitem id="menu_config_transics" name="Transics" parent="base.menu_custom" />
-	<menuitem id="menu_config_transics_log" name="Log" parent="transics.menu_config_transics" action="transics_log_action"/>
-</data>
+                        </group>
+                        <notebook>
+                            <page string="Activities">
+                                <field name="activity_ids" context="{'default_transics_account_id':active_id}">
+                                    <tree>
+                                        <field name="transics_account_id" invisible="1"/>
+                                        <field name="name"/>
+                                        <field name="transics_id"/>
+                                        <field name="is_planning"/>
+                                        <field name="dispatch_enabled"/>
+                                        <field name="activity_type"/>
+                                        <field name="pathinfos"/>
+                                        <field name="oldname"/>
+                                    </tree>
+
+                               </field>
+                            </page>
+                            <page string='Log'>
+                                <field name="log_ids">
+                                </field>      
+                            </page>
+                        </notebook>
+                    </form>
+                </field>
+            </record>
 
 
 
-</openerp>
+
+            <menuitem id="menu_config_transics" name="Transics" parent="base.menu_base_config" />
+            <menuitem id="menu_config_transics_log" name="Log" parent="transics.menu_config_transics" action="transics_log_action"/>
+            <menuitem id="menu_config_transics_account" name="Accounts" parent="transics.menu_config_transics" action="transics_account_action"/>
+        </data>
+
+
+
+    </openerp>

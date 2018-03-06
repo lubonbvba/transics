@@ -2,3 +2,5 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_transics_transics,transics.transics,model_transics_transics,,1,1,1,0
 access_transics_transics,access_transics_transics,model_transics_transics,,1,1,1,0
 access_transics_log,access_transics_log,model_transics_log,,1,1,1,0
+access_transics_account,access_transics_account,model_transics_account,,1,0,0,0
+access_transics_activity,access_transics_activity,model_transics_activity,,1,0,0,0
