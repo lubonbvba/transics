@@ -159,6 +159,7 @@ class transics(models.Model):
 
 		if 'ExtraInfos' in response and response['ExtraInfos']:
 			for info in response['ExtraInfos']['ExtraInfo_V3']:
+				pdb.set_trace()
 				p=info['Place']['CustomerID']
 				hist=self.env['hertsens.destination.hist'].search([('place_id', "=",info['Place']['CustomerID'])])
 				if hist and info['TypeCode'] == 'CMR':
@@ -167,7 +168,8 @@ class transics(models.Model):
 					hist.pallet_unload=info['Info']
 				if hist and info['TypeCode'] == 'EUL':
 					hist.pallet_load=info['Info']
-				#pdb.set_trace()
+				if hist and info['TypeCode'] == 'NOK':
+					pdb.set_trace()
 		if 'Consultation' in response and response['Consultation']:
 			for consult in response['Consultation']['Consultation_V4']:
 				#pdb.set_trace()
@@ -426,7 +428,11 @@ class transics_account(models.Model):
 					hist.pallet_unload=info['Info']
 				if hist and info['TypeCode'] == 'EUL':
 					hist.pallet_load=info['Info']
-				#pdb.set_trace()
+				if hist and info['TypeCode'] == 'NOK':
+					hist.status ='ABORTED'
+					hist.hertsens_destination_id.checkstatus()
+					#pdb.set_trace()
+
 		if 'Consultation' in response and response['Consultation']:
 			for consult in response['Consultation']['Consultation_V4']:
 				#pdb.set_trace()
