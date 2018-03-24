@@ -108,80 +108,6 @@ class transics(models.Model):
 #		pdb.set_trace()
 		self.env.user.company_id.transics_account_id.refresh_transics()
 
-	def zzz():	
-		#pdb.set_trace()
-		startdate=fields.Datetime.from_string(self.env['ir.config_parameter'].get_param('transics.MaximumModificationDate'))
-		if not startdate:
-			startdate=datetime.now() - timedelta(hours=1)
-		enddate=datetime.now()
-		offset = timedelta(hours=1)
-#		startdate +=offset
-		#pdb.set_trace()
-		enddate +=offset
-		login=self.env.user.transics_account_id._makeLogin()
-		pdb.set_trace()
-		request_data = {
-			'Login':self._makeLogin(),
-			'PlanningModificationsSelection':{
-				'PlanningSelectionType':'ALL',
-				'DateTimeRange':{'StartDate': startdate, 'EndDate': enddate}
-			}
-			}
-		#logger.info(request_data) 
-		#pdb.set_trace()
-		response=transics_client.service.Get_Planning_Modifications_V8(**request_data)
-		#pdb.set_trace()
-		self.env['transics.log'].create({'response':str(response),
-										'request_data':str(request_data)
-										})
-		if response['Errors']:
-			_logger.info("Error Get_Planning_Modifications_V8")
-		else:
-			self.env['ir.config_parameter'].sudo().set_param('transics.MaximumModificationDate', response['MaximumModificationDate'] - timedelta(minutes=1))
-		
-		if 'Places' in response and response['Places']:
-			for place in response['Places']['PlaceItemResult_V5']:
-				hist=self.env['hertsens.destination.hist'].search([('place_id', "=",place['PlaceId'])])
-				if not hist:
-					hist=self.env['hertsens.destination.hist'].create({
-						'place_id': place['PlaceId'],
-						})
-				hist.cancelstatus=place['CancelStatus']	
-				hist.transferstatus=place['TransferStatus']	
-				hist.status=place['Status']	
-				hist.lastupdate=place['ModificationDate']-offset
-				hist.raw=place
-				if place['Driver']:
-					driver = self.env['hr.employee'].search([('transics_id', "=",place['Driver']['ID'])])
-					if driver:
-						hist.employee_id=driver.id
-				hist.hertsens_destination_id.checkstatus()		
-
-		if 'ExtraInfos' in response and response['ExtraInfos']:
-			for info in response['ExtraInfos']['ExtraInfo_V3']:
-				pdb.set_trace()
-				p=info['Place']['CustomerID']
-				hist=self.env['hertsens.destination.hist'].search([('place_id', "=",info['Place']['CustomerID'])])
-				if hist and info['TypeCode'] == 'CMR':
-					hist.cmr=info['Info']
-				if hist and info['TypeCode'] == 'EUU':
-					hist.pallet_unload=info['Info']
-				if hist and info['TypeCode'] == 'EUL':
-					hist.pallet_load=info['Info']
-				if hist and info['TypeCode'] == 'NOK':
-					pdb.set_trace()
-		if 'Consultation' in response and response['Consultation']:
-			for consult in response['Consultation']['Consultation_V4']:
-				#pdb.set_trace()
-				hist=self.env['hertsens.destination.hist'].search([('place_id', "=",consult['Place']['PlaceID'])])
-				if hist:
-					hist.km=consult['Km']
-
-					hist.arrivaldate=consult['ArrivalDate'] or hist.arrivaldate
-					hist.leavingdate=consult['LeavingDate'] or hist.leavingdate
-					if consult['Position']:
-						hist.longitude=consult['Position']['Longitude']
-						hist.latitude=consult['Position']['Latitude']
 				
 class transics_log(models.Model):
 	_name="transics.log"
@@ -439,9 +365,10 @@ class transics_account(models.Model):
 				hist=self.env['hertsens.destination.hist'].search([('place_id', "=",consult['Place']['PlaceID'])])
 				if hist:
 					hist.km=consult['Km']
-
-					hist.arrivaldate=consult['ArrivalDate'] or hist.arrivaldate
-					hist.leavingdate=consult['LeavingDate'] or hist.leavingdate
+					if consult['ArrivalDate']:
+						hist.arrivaldate=consult['ArrivalDate'] - offset
+					if 	consult['LeavingDate']: 
+						hist.leavingdate=consult['LeavingDate'] - offset
 					if consult['Position']:
 						hist.longitude=consult['Position']['Longitude']
 						hist.latitude=consult['Position']['Latitude']
