@@ -84,6 +84,7 @@
                             <page string="Activities">
                                 <field name="activity_ids" context="{'default_transics_account_id':active_id}">
                                     <tree>
+                                        <field name="sequence" widget="handle"/>
                                         <field name="transics_account_id" invisible="1"/>
                                         <field name="name"/>
                                         <field name="transics_id"/>

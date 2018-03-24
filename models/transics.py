@@ -465,11 +465,12 @@ class transics_account(models.Model):
 
 class transics_activities(models.Model):
 	_name="transics.activity"
-	_order="is_planning DESC, name"
+	_order="is_planning DESC, sequence, name"
 	transics_account_id=fields.Many2one('transics.account', required=True)
 	dispatch_enabled=fields.Boolean(help="Enabled for dispatch operations?")
 	transics_id=fields.Integer()
 	name=fields.Char()
+	sequence=fields.Integer()
 	is_planning=fields.Boolean()
 	activity_type=fields.Char()
 	pathinfos=fields.Char()
