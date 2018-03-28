@@ -300,7 +300,7 @@ class transics_account(models.Model):
 		transics=self._makeLogin()
 		#pdb.set_trace()
 #		startdate=fields.Datetime.from_string(self.env['ir.config_parameter'].get_param('transics.MaximumModificationDate'))
-		if self.refresh_type == 'odoo':
+		if self.refresh_type == 'odoo' and self.oldest_missing:
 			startdate=fields.Datetime.from_string(self.oldest_missing)
 		else:
 			startdate=fields.Datetime.from_string(self.last_sync)
