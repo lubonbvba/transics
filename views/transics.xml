@@ -77,6 +77,8 @@
                             <field name="integrator"/>
                             <field name="language"/>
                             <field name="last_sync"/>
+                            <field name="oldest_missing"/>
+                            <field name="refresh_type"/>
                             <field name="time_offset"/>
 
                         </group>

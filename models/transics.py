@@ -130,7 +130,9 @@ class transics_account(models.Model):
 	systemnr = fields.Char( required=True)
 	integrator = fields.Char( required=True, default="LUBON")
 	language = fields.Char( required=True, default="NL")
-	last_sync=fields.Datetime()
+	last_sync=fields.Datetime(help="Last ModificationDate returned by transics")
+	oldest_missing=fields.Datetime(help="Oldest hist record without feedback")
+	refresh_type=fields.Selection([('transics','Based on transics max ModificationDate'),('odoo','Based on odoo oldest incomplete record')])
 	time_offset=fields.Integer(help="Time offset between Transics and Odoo")
 	log_ids=fields.One2many('transics.log','transics_account_id')
 
@@ -298,7 +300,10 @@ class transics_account(models.Model):
 		transics=self._makeLogin()
 		#pdb.set_trace()
 #		startdate=fields.Datetime.from_string(self.env['ir.config_parameter'].get_param('transics.MaximumModificationDate'))
-		startdate=fields.Datetime.from_string(self.last_sync)
+		if self.refresh_type == 'odoo':
+			startdate=fields.Datetime.from_string(self.oldest_missing)
+		else:
+			startdate=fields.Datetime.from_string(self.last_sync)
 		if not startdate:
 			startdate=datetime.now()
 		enddate=datetime.now()
@@ -387,7 +392,11 @@ class transics_account(models.Model):
 					else:
 						_logger.warning('Rit bij scan %d niet gevonden' % doc['ScanID'])
 
-
+		self.oldest_missing=None
+		missing=self.env['hertsens.destination.hist'].search([('lastupdate','=',False)]).sorted(key=lambda l: l.lastupdate)
+		#pdb.set_trace()
+		if missing:
+			self.oldest_missing=missing[0].create_date
 
 
 class transics_activities(models.Model):
