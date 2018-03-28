@@ -3,9 +3,9 @@ from openerp import exceptions,models, fields, api, _
 import pdb
 import logging
 from datetime import date,datetime,timedelta
-from pytz import timezone
+#from pytz import timezone,utc
 from dateutil import tz
-import time
+import time,calendar,pytz
 
 from zeep import Client
 
@@ -133,7 +133,7 @@ class transics_account(models.Model):
 	last_sync=fields.Datetime(help="Last ModificationDate returned by transics")
 	oldest_missing=fields.Datetime(help="Oldest hist record without feedback")
 	refresh_type=fields.Selection([('transics','Based on transics max ModificationDate'),('odoo','Based on odoo oldest incomplete record')])
-	time_offset=fields.Integer(help="Time offset between Transics and Odoo")
+	time_offset=fields.Integer(help="Time offset between Transics and Odoo, calcultated automaticaly")
 	log_ids=fields.One2many('transics.log','transics_account_id')
 
 	@api.multi
@@ -298,8 +298,6 @@ class transics_account(models.Model):
 	@api.multi	
 	def refresh_transics(self,dummy=None):
 		transics=self._makeLogin()
-		#pdb.set_trace()
-#		startdate=fields.Datetime.from_string(self.env['ir.config_parameter'].get_param('transics.MaximumModificationDate'))
 		if self.refresh_type == 'odoo' and self.oldest_missing:
 			startdate=fields.Datetime.from_string(self.oldest_missing)
 		else:
@@ -307,9 +305,11 @@ class transics_account(models.Model):
 		if not startdate:
 			startdate=datetime.now()
 		enddate=datetime.now()
-		offset = timedelta(hours=self.time_offset)
+		n=int(datetime.now(pytz.timezone(self.env['res.users'].browse(self.env.uid).tz)).strftime('%z'))/100
+		#offset = timedelta(hours=self.time_offset)
+		offset = timedelta(hours=n)
+		self.time_offset=n
 		startdate +=offset
-		#pdb.set_trace()
 		enddate +=offset
 
 		request_data = {
@@ -330,7 +330,6 @@ class transics_account(models.Model):
 			_logger.info("Error Get_Planning_Modifications_V8")
 		else:
 			self.last_sync=response['MaximumModificationDate'] - timedelta(hours=self.time_offset, minutes=1) #- timedelta(minutes=1) #
-		
 		if 'Places' in response and response['Places']:
 			for place in response['Places']['PlaceItemResult_V5']:
 				hist=self.env['hertsens.destination.hist'].search([('place_id', "=",place['PlaceId'])])
