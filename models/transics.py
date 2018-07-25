@@ -346,7 +346,7 @@ class transics_account(models.Model):
 					driver = self.env['hr.employee'].search([('transics_id', "=",place['Driver']['ID'])])
 					if driver:
 						hist.employee_id=driver.id
-				hist.hertsens_destination_id.checkstatus()		
+				hist.hertsens_destination_id.check_dest_status()		
 
 		if 'ExtraInfos' in response and response['ExtraInfos']:
 			for info in response['ExtraInfos']['ExtraInfo_V3']:
@@ -360,7 +360,7 @@ class transics_account(models.Model):
 					hist.pallet_load=info['Info']
 				if hist and info['TypeCode'] == 'NOK':
 					hist.status ='ABORTED'
-					hist.hertsens_destination_id.checkstatus()
+					hist.hertsens_destination_id.check_dest_status()
 					#pdb.set_trace()
 
 		if 'Consultation' in response and response['Consultation']:
