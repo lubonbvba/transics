@@ -382,12 +382,14 @@ class transics_account(models.Model):
 				for att in scanned_doc['Documents']['DocumentResult_V4']:
 					ride_id=self.env['hertsens.destination.hist'].search([('place_id', "=",att['Place']['PlaceID'])]).ride_id
 					if ride_id:
-						b=self.env['ir.attachment'].create({
-							'res_id':ride_id.id,
-							'res_model':'hertsens.rit',
-							'name':att['FileName'],
-							'datas': att['Document'],
-							})
+						att_id=self.env['ir.attachment'].search([('name','=',att['FileName']),('res_id','=', ride_id.id), ('res_model','=','hertsens.rit')])
+						if not att_id:
+							b=self.env['ir.attachment'].create({
+								'res_id':ride_id.id,
+								'res_model':'hertsens.rit',
+								'name':att['FileName'],
+								'datas': att['Document'],
+								})
 					else:
 						_logger.warning('Rit bij scan %d niet gevonden' % doc['ScanID'])
 
