@@ -90,6 +90,7 @@
                                         <field name="transics_account_id" invisible="1"/>
                                         <field name="name"/>
                                         <field name="transics_id"/>
+                                        <field name="ontime_activity"/>
                                         <field name="is_planning"/>
                                         <field name="dispatch_enabled"/>
                                         <field name="activity_type"/>

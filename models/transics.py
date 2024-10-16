@@ -412,6 +412,7 @@ class transics_activities(models.Model):
 	activity_type=fields.Char()
 	pathinfos=fields.Char()
 	oldname=fields.Char()
+	ontime_activity=fields.Integer()
 
 
 
