@@ -13,30 +13,6 @@ _logger = logging.getLogger(__name__)
 
 transics_client = []
 transics_list = []
-# import logging.config
-
-# logging.config.dictConfig({
-#     'version': 1,
-#     'formatters': {
-#         'verbose': {
-#             'format': '%(name)s: %(message)s'
-#         }
-#     },
-#     'handlers': {
-#         'console': {
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'verbose',
-#         },
-#     },
-#     'loggers': {
-#         'zeep.transports': {
-#             'level': 'DEBUG',
-#             'propagate': True,
-#             'handlers': ['console'],
-#         },
-#     }
-# })
 
 
 
@@ -104,9 +80,10 @@ class transics(models.Model):
 
 	@api.multi	
 	def dispatcher_query(self,dummy=None):
-		logging.info("Transics dispatcher query : %s " % self.env.user.name)
+		logging.info("Start Transics dispatcher query : %s " % self.env.user.name)
 #		pdb.set_trace()
 		self.env.user.company_id.transics_account_id.refresh_transics()
+		logging.info("End Transics dispatcher query : %s " % self.env.user.name)
 
 				
 class transics_log(models.Model):
@@ -320,8 +297,10 @@ class transics_account(models.Model):
 			}
 			}
 		#logger.info(request_data) 
-
+		logging.info("Start Transics https request" )
 		response=transics['client'].service.Get_Planning_Modifications_V8(**request_data)
+		logging.info("End Transics https request" )
+
 		self.env['transics.log'].create({'response':str(response),
 										'request_data':str(request_data),
 										'transics_account_id': self.id,
