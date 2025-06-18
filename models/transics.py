@@ -316,16 +316,22 @@ class transics_account(models.Model):
 					hist=self.env['hertsens.destination.hist'].create({
 						'place_id': place['PlaceId'],
 						})
-				hist.cancelstatus=place['CancelStatus']	
-				hist.transferstatus=place['TransferStatus']	
-				hist.status=place['Status']	
-				hist.lastupdate=place['ModificationDate']-offset
-				hist.raw=place
-				if place['Driver']:
-					driver = self.env['hr.employee'].search([('transics_id', "=",place['Driver']['ID'])])
-					if driver:
-						hist.employee_id=driver.id
-				hist.hertsens_destination_id.check_dest_status()		
+				#nakijken of er een update nodig is
+				if fields.Datetime.from_string(hist.lastupdate) !=(place['ModificationDate']-offset):
+#					diff= place['ModificationDate'] - hist.lastupdate
+					_logger.info("Update for place %s necessary place modification date: %s hist.lastupdate: %s" % (place['PlaceId'], (place['ModificationDate'] - offset), hist.lastupdate))
+					hist.cancelstatus=place['CancelStatus']	
+					hist.transferstatus=place['TransferStatus']	
+					hist.status=place['Status']	
+					hist.lastupdate=place['ModificationDate']-offset
+					hist.raw=place
+					if place['Driver']:
+						driver = self.env['hr.employee'].search([('transics_id', "=",place['Driver']['ID'])])
+						if driver:
+							hist.employee_id=driver.id
+					hist.hertsens_destination_id.check_dest_status()
+				else:
+					_logger.info("No update for place %s" % place['PlaceId'])
 
 		if 'ExtraInfos' in response and response['ExtraInfos']:
 			for info in response['ExtraInfos']['ExtraInfo_V3']:
